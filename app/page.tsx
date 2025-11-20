@@ -7,7 +7,7 @@ export default function Home() {
 
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-foreground mb-2">
-            <span className="text-primary">Himanshi</span> — generate your bar code
+            <span className="text-primary">HMV</span> — generate your bar code
           </h1>
 
           <p className="text-muted-foreground text-lg">
