@@ -1,38 +1,37 @@
-import { MetadataRoute } from "next"
+import { NextResponse } from "next/server"
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const dynamic = "force-static"
+
+export async function GET() {
   const baseUrl = "https://barcode-generator-hmv.vercel.app"
 
-  return [
-    {
-      url: `${baseUrl}/`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/generators/ean-13`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/generators/upc-a`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/generators/code-128`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/generators/qr-code`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
+  const urls = [
+    "",
+    "generators/ean-13",
+    "generators/upc-a",
+    "generators/code-128",
+    "generators/qr-code",
   ]
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls
+  .map(
+    (path) => `
+  <url>
+    <loc>${baseUrl}/${path}</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>${path === "" ? "1.0" : "0.8"}</priority>
+  </url>`
+  )
+  .join("")}
+</urlset>`
+
+  return new NextResponse(xml, {
+    headers: {
+      "Content-Type": "application/xml",
+      "Cache-Control": "public, max-age=3600",
+    },
+  })
 }
