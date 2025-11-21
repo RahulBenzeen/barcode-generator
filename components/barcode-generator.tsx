@@ -1,11 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
+import dynamic from "next/dynamic"
 import { BarcodeGeneratorForm } from "./barcode-generator-form"
-import { BarcodePreview } from "./barcode-preview"
-import { BarcodeInfo } from "./barcode-info"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+// Dynamically import heavy components
+const BarcodePreview = dynamic(() => import("./barcode-preview").then((mod) => mod.BarcodePreview), {
+  loading: () => <div className="h-64 flex items-center justify-center bg-muted/10 rounded-lg">Loading preview...</div>,
+  ssr: false,
+})
+
+const BarcodeInfo = dynamic(() => import("./barcode-info").then((mod) => mod.BarcodeInfo), {
+  loading: () => <div className="h-96 flex items-center justify-center bg-muted/10 rounded-lg">Loading info...</div>,
+})
 
 export interface BarcodeOptions {
   value: string
@@ -22,10 +31,10 @@ export interface GeneratedBarcode extends BarcodeOptions {
   timestamp: number
 }
 
-export function BarcodeGenerator() {
+export function BarcodeGenerator({ initialType = "code128" }: { initialType?: string }) {
   const [options, setOptions] = useState<BarcodeOptions>({
     value: "123456789012",
-    type: "code128",
+    type: initialType,
     width: 2,
     height: 100,
     margin: 10,
@@ -38,10 +47,51 @@ export function BarcodeGenerator() {
   const [error, setError] = useState<string | null>(null)
   const [history, setHistory] = useState<GeneratedBarcode[]>([])
 
-  const handleGenerate = () => {
+  // Memoize validation function
+  const validateBarcodeValue = useCallback((value: string, type: string): { valid: boolean; error?: string } => {
+    if (!value || value.trim() === "") {
+      return { valid: false, error: "Please enter a value" }
+    }
+
+    switch (type) {
+      case "ean13":
+        if (!/^\d{12,13}$/.test(value)) {
+          return { valid: false, error: "EAN-13 requires 12-13 digits" }
+        }
+        break
+      case "ean8":
+        if (!/^\d{7,8}$/.test(value)) {
+          return { valid: false, error: "EAN-8 requires 7-8 digits" }
+        }
+        break
+      case "upca":
+        if (!/^\d{11,12}$/.test(value)) {
+          return { valid: false, error: "UPC-A requires 11-12 digits" }
+        }
+        break
+      case "upce":
+        if (!/^\d{6,8}$/.test(value)) {
+          return { valid: false, error: "UPC-E requires 6-8 digits" }
+        }
+        break
+      case "code39":
+        if (!/^[A-Z0-9\-. $/+%]+$/.test(value)) {
+          return { valid: false, error: "Code 39 supports A-Z, 0-9, and -. $/+%" }
+        }
+        break
+      case "itf":
+        if (!/^\d+$/.test(value) || value.length % 2 !== 0) {
+          return { valid: false, error: "ITF requires an even number of digits" }
+        }
+        break
+    }
+
+    return { valid: true }
+  }, [])
+
+  const handleGenerate = useCallback(() => {
     setError(null)
 
-    // Validate the barcode value based on type
     const validation = validateBarcodeValue(options.value, options.type)
     if (!validation.valid) {
       setError(validation.error || "Invalid barcode value")
@@ -50,19 +100,18 @@ export function BarcodeGenerator() {
 
     setGeneratedBarcode(options)
 
-    // Add to history
     const newEntry: GeneratedBarcode = {
       ...options,
       timestamp: Date.now(),
     }
-    setHistory((prev) => [newEntry, ...prev.slice(0, 9)]) // Keep last 10
-  }
+    setHistory((prev) => [newEntry, ...prev.slice(0, 9)])
+  }, [options, validateBarcodeValue])
 
-  const handleLoadFromHistory = (historyItem: GeneratedBarcode) => {
+  const handleLoadFromHistory = useCallback((historyItem: GeneratedBarcode) => {
     setOptions(historyItem)
     setGeneratedBarcode(historyItem)
     setError(null)
-  }
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -112,45 +161,4 @@ export function BarcodeGenerator() {
       </Tabs>
     </div>
   )
-}
-
-function validateBarcodeValue(value: string, type: string): { valid: boolean; error?: string } {
-  if (!value || value.trim() === "") {
-    return { valid: false, error: "Please enter a value" }
-  }
-
-  switch (type) {
-    case "ean13":
-      if (!/^\d{12,13}$/.test(value)) {
-        return { valid: false, error: "EAN-13 requires 12-13 digits" }
-      }
-      break
-    case "ean8":
-      if (!/^\d{7,8}$/.test(value)) {
-        return { valid: false, error: "EAN-8 requires 7-8 digits" }
-      }
-      break
-    case "upca":
-      if (!/^\d{11,12}$/.test(value)) {
-        return { valid: false, error: "UPC-A requires 11-12 digits" }
-      }
-      break
-    case "upce":
-      if (!/^\d{6,8}$/.test(value)) {
-        return { valid: false, error: "UPC-E requires 6-8 digits" }
-      }
-      break
-    case "code39":
-      if (!/^[A-Z0-9\-. $/+%]+$/.test(value)) {
-        return { valid: false, error: "Code 39 supports A-Z, 0-9, and -. $/+%" }
-      }
-      break
-    case "itf":
-      if (!/^\d+$/.test(value) || value.length % 2 !== 0) {
-        return { valid: false, error: "ITF requires an even number of digits" }
-      }
-      break
-  }
-
-  return { valid: true }
 }

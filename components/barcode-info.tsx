@@ -1,50 +1,66 @@
 export function BarcodeInfo() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold mb-4">Barcode Types & Usage</h2>
-        <div className="space-y-4">
+        <h2 className="text-2xl font-bold mb-4">Supported Barcode Types Guide</h2>
+        <p className="text-muted-foreground mb-6">
+          Choosing the right barcode format is crucial for your specific use case. Here is a detailed guide to the most
+          common barcode standards we support.
+        </p>
+        <div className="space-y-6">
           <InfoSection
-            title="Code 128"
-            description="General-purpose barcode that can encode the full ASCII character set. Widely used in shipping, packaging, and supply chain management."
-            usage="Any alphanumeric data"
+            title="Code 128 (Standard)"
+            description="The most versatile and high-density linear barcode. It can encode all 128 ASCII characters (letters, numbers, and symbols). Ideal for logistics, shipping labels, and inventory management."
+            usage="Shipping, Inventory, ID Cards, Supply Chain"
+          />
+          <InfoSection
+            title="EAN-13 (International Retail)"
+            description="The standard barcode for retail products worldwide (except North America). It encodes 13 numeric digits and is required for selling products in global marketplaces."
+            usage="Retail Products (Global), Books (ISBN), Magazines"
+          />
+          <InfoSection
+            title="UPC-A (North American Retail)"
+            description="The standard retail barcode used in the United States and Canada. It encodes 12 numeric digits and is universally recognized by point-of-sale systems in North America."
+            usage="Retail Products (USA & Canada), Groceries"
+          />
+          <InfoSection
+            title="QR Code (2D Barcode)"
+            description="A two-dimensional matrix barcode that can store significant amounts of data including URLs, contact info (vCard), Wi-Fi credentials, and text. Scannable by all smartphones."
+            usage="Marketing, Website Links, Digital Menus, Payments"
           />
           <InfoSection
             title="Code 39"
-            description="Older standard that encodes uppercase letters, numbers, and a few special characters. Still used in automotive and defense industries."
-            usage="A-Z, 0-9, and -. $/+%"
+            description="An older alphanumeric standard that is still widely used in non-retail environments. It supports uppercase letters, numbers, and a few special characters."
+            usage="Automotive, Defense, Internal Inventory, Badges"
           />
           <InfoSection
-            title="EAN-13"
-            description="International standard for retail products. Used worldwide for point-of-sale scanning."
-            usage="12-13 digits (the 13th is a check digit)"
-          />
-          <InfoSection
-            title="EAN-8"
-            description="Compact version of EAN-13 for small packages where space is limited."
-            usage="7-8 digits"
-          />
-          <InfoSection
-            title="UPC-A"
-            description="Standard barcode for retail products in North America."
-            usage="11-12 digits"
-          />
-          <InfoSection
-            title="UPC-E"
-            description="Compressed version of UPC-A for smaller packages."
-            usage="6-8 digits"
-          />
-          <InfoSection
-            title="QR Code"
-            description="2D barcode that can store much more information including URLs, contact information, and text."
-            usage="Any text, URLs, up to several thousand characters"
-          />
-          <InfoSection
-            title="ITF (Interleaved 2 of 5)"
-            description="Used for packaging and distribution, especially in the logistics industry."
-            usage="Even number of digits only"
+            title="ITF-14 (Interleaved 2 of 5)"
+            description="A high-density numeric-only barcode primarily used on corrugated cardboard packaging and shipping boxes. It is designed to be printed directly on lower-quality materials."
+            usage="Warehouse, Logistics, Shipping Cartons"
           />
         </div>
+      </div>
+
+      <div className="pt-8 border-t border-border">
+        <h3 className="text-2xl font-bold mb-4">How to Create a Barcode</h3>
+        <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
+          <li>
+            <strong className="text-foreground">Select Format:</strong> Choose the appropriate barcode type (e.g.,
+            EAN-13 for retail, Code 128 for internal use).
+          </li>
+          <li>
+            <strong className="text-foreground">Enter Data:</strong> Type your alphanumeric code or text. The preview
+            will update instantly.
+          </li>
+          <li>
+            <strong className="text-foreground">Customize:</strong> Adjust the height, width, and colors to match your
+            design requirements.
+          </li>
+          <li>
+            <strong className="text-foreground">Download:</strong> Save your barcode as a high-quality PNG, SVG, or PDF
+            file for printing.
+          </li>
+        </ol>
       </div>
 
       <div className="pt-6 border-t border-border">
