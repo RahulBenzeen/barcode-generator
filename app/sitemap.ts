@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server"
 
+// Make sure Next.js treats it as a static file
 export const dynamic = "force-static"
 
+export default function sitemap() {
+  // Next.js still expects a default export for metadata system,
+  // so we return an empty array here. It will be ignored.
+  return [];
+}
+
+// This GET method will override the default sitemap output
 export async function GET() {
   const baseUrl = "https://barcode-generator-hmv.vercel.app"
 
